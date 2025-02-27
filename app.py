@@ -12,26 +12,32 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 import json
 
 def ai(messages, model="gpt-4o-mini", temperature=0):
-    messages = "Form to JSON!" + messages   
+    messages = [{"role": "user", "content": "Form to JSON! " + messages}]  # Correct messages format
+    
     response = client.chat.completions.create(
         model=model,
-        messages=[{"role": "user", "content": messages}],  # Ensure messages is a list
+        messages=messages,  # Pass as a list
         temperature=temperature,
     )
     
-    raw_response = response.choices[0].message.content
+    raw_response = response.choices[0].message.content.strip()  # Ensure clean response
     
-    # Remove markdown code blocks if present
+    # Debug: Print AI response
+    print("AI Raw Response:", raw_response)  
+    
+    # Remove markdown if present
     if raw_response.startswith("```json"):
         raw_response = raw_response[7:]  # Remove ```json
     if raw_response.endswith("```"):
         raw_response = raw_response[:-3]  # Remove ```
-    
+
+    # Try parsing as JSON
     try:
-        json_data = json.loads(raw_response)  # Validate JSON format
-        return json_data  # Return parsed JSON
+        json_data = json.loads(raw_response)
+        return json_data  # Successfully parsed JSON
     except json.JSONDecodeError as e:
-        return f"Invalid JSON: {str(e)}\nResponse: {raw_response}"
+        return {"error": f"Invalid JSON: {str(e)}", "response": raw_response}  # Return error for debugging
+
 
 
 
