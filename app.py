@@ -1,5 +1,6 @@
 import streamlit as st
-from pymupdf import fitz  
+#from pymupdf 
+import fitz  
 import os
 import openai
 from dotenv import load_dotenv
