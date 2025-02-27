@@ -1,13 +1,11 @@
 import streamlit as st
-import fitz  # pymupdf
+from pymupdf import fitz  
 import os
 import openai
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# Set OpenAI API key
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def ai(user_message, model="gpt-4o", temperature=0):
@@ -19,7 +17,7 @@ def ai(user_message, model="gpt-4o", temperature=0):
     response = client.chat.completions.create(
         model=model,
         messages=messages,
-        temperature=temperature  # Controls randomness
+        temperature=temperature  
     )
     
     return response.choices[0].message.content
@@ -39,4 +37,3 @@ if f is not None:
         result = ai(text)  
   
     st.json(result)
-    
