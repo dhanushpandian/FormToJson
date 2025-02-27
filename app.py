@@ -11,12 +11,14 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 import json
 
+import re
+
 def ai(messages, model="gpt-4o-mini", temperature=0):
     messages = [{"role": "user", "content": "Form to JSON! " + messages}]  # Correct messages format
     
     response = client.chat.completions.create(
         model=model,
-        messages=messages,  # Pass as a list
+        messages=messages,
         temperature=temperature,
     )
     
@@ -25,12 +27,14 @@ def ai(messages, model="gpt-4o-mini", temperature=0):
     # Debug: Print AI response
     print("AI Raw Response:", raw_response)  
     
-    # Remove markdown if present
-    if raw_response.startswith("```json"):
-        raw_response = raw_response[7:]  # Remove ```json
-    if raw_response.endswith("```"):
-        raw_response = raw_response[:-3]  # Remove ```
-
+    # Extract JSON content using regex
+    json_match = re.search(r'```json\s*([\s\S]+?)\s*```', raw_response)  # Match content inside ```json ... ```
+    if json_match:
+        raw_response = json_match.group(1).strip()
+    else:
+        # If no markdown, assume the whole response is JSON
+        raw_response = raw_response.strip()
+    
     # Try parsing as JSON
     try:
         json_data = json.loads(raw_response)
