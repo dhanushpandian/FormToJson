@@ -9,19 +9,32 @@ load_dotenv()
 
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def ai(user_message, model="gpt-4o", temperature=0):
-    messages = [
-        {"role": "system", "content": "You are a helpful AI assistant that converts forms into JSON."},
-        {"role": "user", "content": user_message}
-    ]
-    
+import json
+
+def ai(messages, model="gpt-4o-mini", temperature=0):
+    messages = "Form to JSON!" + messages   
     response = client.chat.completions.create(
         model=model,
-        messages=messages,
-        temperature=temperature  
+        messages=[{"role": "user", "content": messages}],  # Ensure messages is a list
+        temperature=temperature,
     )
     
-    return response.choices[0].message.content
+    raw_response = response.choices[0].message.content
+    
+    # Remove markdown code blocks if present
+    if raw_response.startswith("```json"):
+        raw_response = raw_response[7:]  # Remove ```json
+    if raw_response.endswith("```"):
+        raw_response = raw_response[:-3]  # Remove ```
+    
+    try:
+        json_data = json.loads(raw_response)  # Validate JSON format
+        return json_data  # Return parsed JSON
+    except json.JSONDecodeError as e:
+        return f"Invalid JSON: {str(e)}\nResponse: {raw_response}"
+
+
+
 
 st.title("Form to JSON!")
 
