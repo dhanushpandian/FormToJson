@@ -14,7 +14,7 @@ import json
 import re
 
 def ai(messages, model="gpt-4o-mini", temperature=0):
-    messages = [{"role": "user", "content": "Form to JSON! " + messages}]  # Correct messages format
+    messages = [{"role": "user", "content": "Form to JSON! " + messages}]  
     
     response = client.chat.completions.create(
         model=model,
@@ -22,26 +22,25 @@ def ai(messages, model="gpt-4o-mini", temperature=0):
         temperature=temperature,
     )
     
-    raw_response = response.choices[0].message.content.strip()  # Ensure clean response
+    raw_response = response.choices[0].message.content.strip()  
     
-    # Debug: Print AI response
+    
     print("AI Raw Response:", raw_response)  
     
     # Extract JSON content using regex
-    json_match = re.search(r'```json\s*([\s\S]+?)\s*```', raw_response)  # Match content inside ```json ... ```
+    json_match = re.search(r'```json\s*([\s\S]+?)\s*```', raw_response)  
     if json_match:
         raw_response = json_match.group(1).strip()
     else:
-        # If no markdown, assume the whole response is JSON
+       
         raw_response = raw_response.strip()
     
-    # Try parsing as JSON
+   
     try:
         json_data = json.loads(raw_response)
-        return json_data  # Successfully parsed JSON
+        return json_data  
     except json.JSONDecodeError as e:
-        return {"error": f"Invalid JSON: {str(e)}", "response": raw_response}  # Return error for debugging
-
+        return {"error": f"Invalid JSON: {str(e)}", "response": raw_response} 
 
 
 
