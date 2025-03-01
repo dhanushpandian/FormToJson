@@ -14,7 +14,7 @@ import json
 import re
 
 def ai(messages, model="gpt-4o-mini", temperature=0):
-    messages = [{"role": "user", "content": "Form to JSON! " + messages}]  
+    messages = [{"role": "user", "content": "give me a json output for the data: " + messages}]  
     
     response = client.chat.completions.create(
         model=model,
@@ -56,7 +56,10 @@ if f is not None:
     for page in doc:
         text += page.get_text("text") + "\n"
     
-    with st.spinner("Processing... Please wait."):
-        result = ai(text)  
-  
-    st.json(result)
+    if len(text) > 10:
+        with st.spinner("Processing... Please wait."):
+            result = ai(text)  
+            st.json(result)
+    else:
+        st.error("No text found in the PDF file.")
+
