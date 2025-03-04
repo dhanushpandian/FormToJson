@@ -25,3 +25,4 @@ def text_Extractor(file):
         print(f" - {line.content}")
         extracted_text.append(line.content)
   return extracted_text   
+
