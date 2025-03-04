@@ -4,3 +4,4 @@ streamlit
 openai
 pymupdf
 google-generativeai
+azure-ai-formrecognizer
